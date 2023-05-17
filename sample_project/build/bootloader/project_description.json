@@ -1,0 +1,25 @@
+{
+    "project_name":       "bootloader",
+    "project_path":       "D:/express-idf/components/bootloader/subproject",
+    "build_dir":          "D:/Universidad/2023-1/Sistemas embedidos/Tarea1/sample_project/build/bootloader",
+    "config_file":        "D:/Universidad/2023-1/Sistemas embedidos/Tarea1/sample_project/sdkconfig",
+    "config_defaults":    "",
+    "bootloader_elf":     "",
+    "app_elf":            "bootloader.elf",
+    "app_bin":            "bootloader.bin",
+    "git_revision":       "v5.0.1",
+    "target":             "esp32",
+    "rev":                "0",
+    "min_rev":            "0",
+    "max_rev":            "399",
+    "phy_data_partition": "",
+    "monitor_baud" :      "115200",
+    "monitor_toolprefix": "xtensa-esp32-elf-",
+    "config_environment" : {
+        "COMPONENT_KCONFIGS" : "D:/express-idf/components/efuse/Kconfig;D:/express-idf/components/esp_common/Kconfig;D:/express-idf/components/esp_hw_support/Kconfig;D:/express-idf/components/esp_system/Kconfig;D:/express-idf/components/freertos/Kconfig;D:/express-idf/components/hal/Kconfig;D:/express-idf/components/log/Kconfig;D:/express-idf/components/newlib/Kconfig;D:/express-idf/components/spi_flash/Kconfig",
+        "COMPONENT_KCONFIGS_PROJBUILD" : "D:/express-idf/components/bootloader/Kconfig.projbuild;D:/express-idf/components/esp_app_format/Kconfig.projbuild;D:/express-idf/components/esp_rom/Kconfig.projbuild;D:/express-idf/components/esptool_py/Kconfig.projbuild;D:/express-idf/components/partition_table/Kconfig.projbuild"
+    },
+    "build_components" : [ "bootloader", "bootloader_support", "efuse", "esp_app_format", "esp_common", "esp_hw_support", "esp_rom", "esp_system", "esptool_py", "freertos", "hal", "log", "main", "micro-ecc", "newlib", "partition_table", "soc", "spi_flash", "xtensa", "" ],
+    "build_component_paths" : [ "D:/express-idf/components/bootloader", "D:/express-idf/components/bootloader_support", "D:/express-idf/components/efuse", "D:/express-idf/components/esp_app_format", "D:/express-idf/components/esp_common", "D:/express-idf/components/esp_hw_support", "D:/express-idf/components/esp_rom", "D:/express-idf/components/esp_system", "D:/express-idf/components/esptool_py", "D:/express-idf/components/freertos", "D:/express-idf/components/hal", "D:/express-idf/components/log", "D:/express-idf/components/bootloader/subproject/main", "D:/express-idf/components/bootloader/subproject/components/micro-ecc", "D:/express-idf/components/newlib", "D:/express-idf/components/partition_table", "D:/express-idf/components/soc", "D:/express-idf/components/spi_flash", "D:/express-idf/components/xtensa", "" ],
+    "debug_prefix_map_gdbinit": ""
+}
