@@ -562,7 +562,7 @@ void powermode(void)
     }
 
     ret2= bmi_read(I2C_NUM_0, &reg_pwr_ctrl, &tmp2,1);
-    printf("valor de PWR_CTRL: %2X \n y el binary es: ",tmp2);
+    ESP_LOGI(POWER_MODE,"valor de PWR_CTRL: %2X \n y el binary es: ",tmp2);
     print_binary(tmp2);
     printf("\n");
 
@@ -734,12 +734,15 @@ void printAnymotionStatus() {
   // Leer el registro de estado de interrupción general
   bmi_read(I2C_NUM_0, &reg_int_status_0, &value_int_status_0, 1);
 
-  // Verificar el bit correspondiente a la detección de Any-motion (bit 4)
-  int anymotion_detected = (value_int_status_0 & (1 << 4)) != 0;
-
+  // Verificar el bit correspondiente a la detección de Any-motion (bit 6)
+  int anymotion_detected = (value_int_status_0 & (1 << 6)) != 0;
+  print_binary(value_int_status_0);
+  printf("\n");
   // Imprimir el estado de la detección de Any-motion
   if (anymotion_detected){
     ESP_LOGI("Any-motion Status ","%s\n", anymotion_detected ? "Detected" : "Not detected");
+    suspended_powermode();
+    powermode();
   }
   else{
     printf("Any-motion Status: %s\n", anymotion_detected ? "Detected" : "Not detected");
@@ -755,7 +758,8 @@ void lectura(void)
     uint8_t reg_data = 0x0C, data_data8[bytes_data8];
     uint16_t acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z;
     static const char *DATA = "Data"; 
-    while (1)
+    int i = 30;
+    while (i)
     {
         bmi_read(I2C_NUM_0, &reg_intstatus, &tmp,1);
         // printf("Init_status.0: %x - mask: %x \n", tmp, (tmp & 0b10000000));
@@ -788,13 +792,15 @@ void lectura(void)
             printAnymotionStatus();
 
             //vTaskDelay(2000 /portTICK_PERIOD_MS); 
-
+            i--;
             if(ret != ESP_OK){
                 printf("Error lectura: %s \n",esp_err_to_name(ret));
             }
 
         }
     }
+    suspended_powermode();
+    powermode();
 
 }
 
@@ -922,7 +928,7 @@ void gyr_conf(int range){
     }
 
     // Escribir el valor en el registro correspondiente
-   bmi_write(I2C_NUM_0, &addrs, &reg_value,1);
+    bmi_write(I2C_NUM_0, &addrs, &reg_value,1);
 
 }
 /**
@@ -992,61 +998,84 @@ void ois_range(int range) {
     bmi_write(I2C_NUM_0, &addrs, &reg_value,1);
 }
 
+
 /**
  *  Config the ANYMOTION mode  
     - duration: Rango válido: 0 a 163 segundos. Esto se traduce a 0 a 8150 muestras de 50 Hz (20 ms).
     - select_x, select_y, select_z: Estos son parámetros booleanos, por lo que solo aceptan los valores true o false.
     - threshold: Rango válido: 0 a 31. Cada unidad representa 83 mg (miligravedades).
-    - out_conf: Rango válido: 0 a 15. Cada valor habilita la salida del correspondiente bit 0 a 7 en el registro INT_STATUS_0 e INT1/2_MAP_FEAT.
+    - out_conf: Rango válido: 0 a 8. Cada valor habilita la salida del correspondiente bit 0 a 7 en el registro INT_STATUS_0 e INT1/2_MAP_FEAT.
 */
 void conf_anymotion(uint16_t duration, int select_x, int select_y, int select_z, uint8_t threshold, uint8_t out_conf) {
 
     uint8_t reg_anymo_1 = 0x3C; // 1er registro de anymotion
-    uint8_t reg_value;
+    uint8_t reg_value1,reg_value2;
 
     // leer registro guardado en ANYMO_1
-    bmi_read(I2C_NUM_0, &reg_anymo_1, &reg_value, 1);
-
-    
-    reg_value &= ~(0x1FFF);                  // limpiar los bits del 0 al 12 
-    reg_value |= ((duration / 20) & 0x1FFF); // conversion de la duracion a 50hz por cada 20ms
+    bmi_read(I2C_NUM_0, &reg_anymo_1, &reg_value1, 1);
+    //printf("reg_value1 antes = ");
+    //print_binary(reg_value1);
+    //printf("\n");
+    reg_value1 &= ~(0x1F);                  // limpiar los bits del 0 al 12 
+    reg_value1 |= ((duration / 20) & 0x1F); // conversion de la duracion a 50hz por cada 20ms
 
     if (select_x) {
-        reg_value |= (1 << 13); // True == Cambiar el bit del eje x
+        reg_value1 |= (1 << 13); // True == Cambiar el bit del eje x
     } else {
-        reg_value &= ~(1 << 13); 
+        reg_value1 &= ~(1 << 13); 
     }
 
     if (select_y) {
-        reg_value |= (1 << 14); // True == Cambiar el bit del eje y
+        reg_value1 |= (1 << 14); // True == Cambiar el bit del eje y
     } else {
-        reg_value &= ~(1 << 14); 
+        reg_value1 &= ~(1 << 14); 
     }
 
     if (select_z) {
-        reg_value |= (1 << 15); // True == Cambiar el bit del eje z
+        reg_value1 |= (1 << 15); // True == Cambiar el bit del eje z
     } else {
-        reg_value &= ~(1 << 15); 
+        reg_value1 &= ~(1 << 15); 
     }
 
-    bmi_write(I2C_NUM_0, &reg_anymo_1, &reg_value, 1);
+    bmi_write(I2C_NUM_0, &reg_anymo_1, &reg_value1, 1);
 
     uint8_t reg_anymo_2 = 0x3E;         // 2do registro de anymotion
 
     // leer registro guardado en ANYMO_2
-    bmi_read(I2C_NUM_0, &reg_anymo_2, &reg_value, 1);
+    bmi_read(I2C_NUM_0, &reg_anymo_2, &reg_value2, 1);
 
     
-    reg_value &= ~(0x1F);               // limpiar el bit 0 al 4
-    reg_value |= (threshold & 0x1F);    // se sobreescribe el threshold
+    reg_value2 &= ~(0x1F);               // limpiar el bit 0 al 4
+    reg_value2 |= (threshold & 0x1F);    // se sobreescribe el threshold
 
-    reg_value &= ~(0xF << 11);          // limpiar el bit 11 al 14
-    reg_value |= (out_conf << 11);      // se sobreescribe el out_conf
+    reg_value2 &= ~(0xF << 11);          // limpiar el bit 11 al 14
+    reg_value2 |= (out_conf << 11);      // se sobreescribe el out_conf
 
+    printf("reg_value1 =  ");
+    print_binary(reg_value1);
+    printf("reg_value2 =  ");
+    print_binary(reg_value2);
+    printf("\n");
     
-    bmi_write(I2C_NUM_0, &reg_anymo_2, &reg_value, 1);
+    bmi_write(I2C_NUM_0, &reg_anymo_2, &reg_value2, 1);
 }
 
+/*
+// Función para configurar el anymotion y la interrupción en el sensor BMI270 
+void bmi_anymotion_int_config(uint16_t duration, int select_x, int select_y, int select_z, uint8_t threshold, uint8_t out_conf) { // Llamar a la función conf_anymotion con los parámetros que quieras conf_anymotion(duration, select_x, select_y, select_z, threshold, out_conf);
+
+// Crear un buffer con el registro FEAT_EN y el valor para habilitar el anymotion uint8_t buffer[2]; buffer[0] = 0x4C; // FEAT_EN buffer[1] = 0x01; // ANYMOTION_EN
+
+// Escribir el buffer en el sensor 
+bmi_write(I2C_NUM_0, buffer, 2);
+
+// Crear un buffer con el registro INT_MAP_FEAT y el valor para asignar la interrupción al pin 
+INT1 o INT2 buffer[0] = 0x56; // 
+INT_MAP_FEAT buffer[1] = 0x01; // ANYMOTION_INT1 o 0x02 para ANYMOTION_INT2
+
+// Escribir el buffer en el sensor 
+bmi_write(I2C_NUM_0, buffer, 2); }
+*/
 
 
 void app_main(void)
@@ -1058,31 +1087,15 @@ void app_main(void)
     check_initialization();
     
     acc_conf(8);
-    acc_range(2);
+    acc_range(0);
 
     gyr_conf(12);
-    gyr_range(3);
+    gyr_range(0);
     
     
-    //suspended_powermode();
-    //powermode();
-
-
-    normal_powermode();
-    powermode();
-
-    //low_powermode();
-    //powermode();
-
-    //performance_powermode();
-    //powermode();
-
-    internal_status();    
-
-
-    uint8_t addrs = 0x40;
+    uint8_t addrs4 = 0x40;
     uint8_t tmp;
-    bmi_read(I2C_NUM_0,&addrs,&tmp,1);
+    bmi_read(I2C_NUM_0,&addrs4,&tmp,1);
     printf("CONF DE ACC : ");
     print_binary(tmp);
 
@@ -1104,14 +1117,45 @@ void app_main(void)
     printf("RANGE DE GYR : ");
     print_binary(tmp4);
 
-    uint8_t duration = 1;          // Duración de 10 muestras (200 ms)
+
+    //suspended_powermode();
+    //powermode();
+
+
+    //normal_powermode();
+    //powermode();
+
+    //low_powermode();
+    //powermode();
+
+    performance_powermode();
+    powermode();
+
+    internal_status();    
+
+
+
+    uint8_t duration = 100;          // Duración de 10 muestras (200 ms)
     int select_x = 1;           // Seleccionar eje X
-    int select_y = 0;          // No seleccionar eje Y
+    int select_y = 1;          //seleccionar eje Y
     int select_z = 1;           // Seleccionar eje Z
-    uint8_t out_conf = 4;           // Salida asignada al bit 3 (INT_STATUS_0, bit 3)
+    uint8_t out_conf = 6;           // Salida asignada al bit 3 (INT_STATUS_0, bit 3)
     uint8_t threshold = 1;         // Umbral de 50 (valores específicos del sensor)
 
     conf_anymotion(duration, select_x, select_y, select_z, out_conf, threshold);
+    /*uint8_t buffer[2];
+    buffer[0] = 0x4C; // FEAT_EN
+    buffer[1] = 0x01; // ANYMOTION_EN
+
+        // Escribir el buffer en el sensor
+    bmi_write(I2C_NUM_0, buffer, 2);
+
+        // Crear un buffer con el registro INT_MAP_FEAT y el valor para asignar la interrupción al pin INT1 o INT2
+    buffer[0] = 0x56; // INT_MAP_FEAT
+    buffer[1] = 0x01; // ANYMOTION_INT1 o 0x02 para ANYMOTION_INT2
+
+        // Escribir el buffer en el sensor
+    bmi_write(I2C_NUM_0, buffer, 2);*/
     //printAnymotionStatus();
     //suspended_powermode();
     //powermode();
@@ -1119,5 +1163,5 @@ void app_main(void)
    // conf_anymotion(10, true, false, true, 200, 0x02);
     printf("Comienza lectura\n\n");
     lectura();
-    
+    //a funcion that 
 }

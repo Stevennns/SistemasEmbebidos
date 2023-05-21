@@ -1,0 +1,5 @@
+menu “Example Configuration”
+
+config GPIO_INPUT_INTR_NUM int “GPIO Input Interrupt Number” range 0 39 default 22 help The selected GPIO will be configured as an input with internal pull-up enabled (note that on some SoCs, not all pins have an internal pull-up, consult the hardware datasheet for details.) To trigger a factory reset, this GPIO must be held high or low (as configured) on startup.
+
+endmenu
