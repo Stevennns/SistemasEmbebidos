@@ -1,12 +1,19 @@
 #include "driver/i2c.h"
 #include "bme68x/bme68x.h"
-
+#include <string.h>
 #define I2C_MASTER_SDA_IO 21 // select SDA GPIO specific to your project
 #define I2C_MASTER_SCL_IO 22 // select SCL GPIO specific to your project
 //#define I2C_MASTER_FREQ_HZ 100000 // select frequency specific to your project
 #define I2C_MASTER_FREQ_HZ 400000 // select frequency specific to your project
 
 #define BME680_ADDR 0x76 // address of the BME680 sensor
+
+volatile uint8_t i2c_data[32]; // volatile variable to store the data
+
+
+
+
+
 
 // User-defined function to read from the sensor
 int8_t user_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr)
@@ -31,21 +38,24 @@ int8_t user_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *in
 }
 
 // User-defined function to write to the sensor
-int8_t user_i2c_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, void *intf_ptr)
+int8_t user_i2c_write(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr)
 {
     int8_t rslt = 0;
     uint8_t dev_id = *((uint8_t *)intf_ptr);
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (dev_id << 1) | I2C_MASTER_WRITE, true); // write the device address and write bit
-    i2c_master_write_byte(cmd, reg_addr, true); // write the register address
-    i2c_master_write(cmd, reg_data, len, true); // write the data
+    i2c_master_write_byte(cmd, (dev_id << 1) | I2C_MASTER_WRITE, false); // write the device address and write bit
+    i2c_master_write_byte(cmd, reg_addr, false); // write the register address
+    memcpy(i2c_data, reg_data, len); // copy the data to the static variable
+    i2c_master_write(cmd, i2c_data, len, false); // write the data
     i2c_master_stop(cmd);
     rslt = i2c_master_cmd_begin(0, cmd, 2000 / portTICK_PERIOD_MS); // send the command
     printf("rslt write = %d\n", rslt); // print the result
     i2c_cmd_link_delete(cmd);
     return rslt;
 }
+
+
 
 
 // User-defined function to delay in microseconds
