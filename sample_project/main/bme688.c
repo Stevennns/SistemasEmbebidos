@@ -37,23 +37,34 @@ int8_t user_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *in
     return rslt;
 }
 
+
 // User-defined function to write to the sensor
-int8_t user_i2c_write(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr)
+int8_t user_i2c_write(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr) // Cambiar el tipo de reg_data a uint8_t
 {
+    printf("se llamo a user_i2c_write\n");
     int8_t rslt = 0;
     uint8_t dev_id = *((uint8_t *)intf_ptr);
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (dev_id << 1) | I2C_MASTER_WRITE, false); // write the device address and write bit
-    i2c_master_write_byte(cmd, reg_addr, false); // write the register address
-    memcpy(i2c_data, reg_data, len); // copy the data to the static variable
-    i2c_master_write(cmd, i2c_data, len, false); // write the data
+    i2c_master_write_byte(cmd, (dev_id << 1) | I2C_MASTER_WRITE, true);
+    i2c_master_write_byte(cmd, reg_addr, true);
+    vTaskDelay(2 / portTICK_PERIOD_MS); // Esperar 2 ms para que el sensor esté listo
+    i2c_master_write(cmd, reg_data, len, true); // Cambiar el tipo de reg_data a uint8_t
+    vTaskDelay(2 / portTICK_PERIOD_MS); // Esperar 2 ms para que el sensor esté listo
+
     i2c_master_stop(cmd);
-    rslt = i2c_master_cmd_begin(0, cmd, 2000 / portTICK_PERIOD_MS); // send the command
-    printf("rslt write = %d\n", rslt); // print the result
+    esp_err_t ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 2000 / portTICK_PERIOD_MS);
+    if (ret == ESP_OK) {
+        rslt = 0;
+    } else {
+        rslt = 1;
+    }
     i2c_cmd_link_delete(cmd);
+    printf("rslt write = %d\n", rslt); // print the result
     return rslt;
+
 }
+
 
 
 
@@ -105,7 +116,7 @@ void i2c_scanner()
 // Read data from the BME680 sensor
 void read_bme688_data()
 {
-    printf("Leyenndo datos");
+    printf("Leyenndo datos\n");
     int8_t rslt;
     struct bme68x_dev dev;
     struct bme68x_conf conf;
@@ -177,9 +188,11 @@ void read_bme688_data()
 void app_main()
 {
     i2c_master_init(); // initialize the I2C driver
+    vTaskDelay(10 / portTICK_PERIOD_MS); // Esperar 10 ms para que el sensor se inicie
     i2c_scanner();
     i2c_driver_delete(0); // delete the I2C driver
     i2c_master_init(); // initialize the I2C driver again
+    vTaskDelay(10 / portTICK_PERIOD_MS); // Esperar 10 ms para que el sensor se inicie
     printf("Delay aaaa\n");
     vTaskDelay(2000 / portTICK_PERIOD_MS); // wait for 2 seconds
     read_bme688_data(); // read data from the BME680 sensor
