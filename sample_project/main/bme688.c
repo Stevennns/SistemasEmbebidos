@@ -41,7 +41,7 @@ int8_t user_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *in
 // User-defined function to write to the sensor
 int8_t user_i2c_write(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr) // Cambiar el tipo de reg_data a uint8_t
 {
-    printf("se llamo a user_i2c_write\n");
+    printf("USER_I2C_WRITE LLAMADO");
     int8_t rslt = 0;
     uint8_t dev_id = *((uint8_t *)intf_ptr);
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -128,15 +128,18 @@ void read_bme688_data()
     dev.read = (bme68x_read_fptr_t)user_i2c_read; // user-defined function to read from the sensor
     dev.write = (bme68x_write_fptr_t)user_i2c_write; // user-defined function to write to the sensor
     dev.delay_us = (bme68x_delay_us_fptr_t)user_delay_us; // user-defined function to delay in microseconds
-
+    printf("Despues de la estructura\n"); // print the result
 
     rslt = bme68x_init(&dev); // initialize the device
+    printf("llamado bme68x_init(&dev)\n"); // print the result
+    vTaskDelay(5 / portTICK_PERIOD_MS); // Esperar 5 ms para que el sensor esté listo
     if (rslt != BME68X_OK) {
         printf("Failed to initialize the device\n");
         return;
     }
 
     rslt = bme68x_get_conf(&conf, &dev); // get the default configuration
+    printf("llamado bme68x_get_conf\n"); // print the result
     if (rslt != BME68X_OK) {
         printf("Failed to get configuration\n");
         return;
@@ -146,6 +149,8 @@ void read_bme688_data()
     conf.odr = BME68X_ODR_NONE; // set the output data rate to none
 
     rslt = bme68x_set_conf(&conf, &dev); // set the configuration
+    printf("llamado bme68x_set_conf\n"); // print the result
+    vTaskDelay(5 / portTICK_PERIOD_MS); // Esperar 5 ms para que el sensor esté listo
     if (rslt != BME68X_OK) {
         printf("Failed to set configuration\n");
         return;
@@ -156,12 +161,16 @@ void read_bme688_data()
     heatr_conf.heatr_dur = 150; // set the heater duration to 150 milliseconds
 
     rslt = bme68x_set_heatr_conf(BME68X_FORCED_MODE, &heatr_conf, &dev); // set the heater configuration
+    printf("llamado bme68x_set_heatr_conf\n"); // print the result
+    vTaskDelay(5 / portTICK_PERIOD_MS); // Esperar 5 ms para que el sensor esté listo
     if (rslt != BME68X_OK) {
         printf("Failed to set heater configuration\n");
         return;
     }
 
     rslt = bme68x_set_op_mode(BME68X_FORCED_MODE, &dev); // set the operation mode to forced
+    printf("llamado bme68x_set_op_mode\n"); // print the result
+    vTaskDelay(5 / portTICK_PERIOD_MS); // Esperar 5 ms para que el sensor esté listo
     if (rslt != BME68X_OK) {
         printf("Failed to set operation mode\n");
         return;
@@ -169,6 +178,8 @@ void read_bme688_data()
 
     uint8_t n_fields;
     rslt = bme68x_get_data(BME68X_FORCED_MODE, data, &n_fields, &dev); // get the sensor data
+    printf("llamado bme68x_get_data\n"); // print the result
+    vTaskDelay(5 / portTICK_PERIOD_MS); // Esperar 5 ms para que el sensor esté listo
     if (rslt != BME68X_OK) {
         printf("Failed to get sensor data\n");
         return;
@@ -183,6 +194,7 @@ void read_bme688_data()
         printf("Status: %d\n", data[i].status);
     }
 }
+
 
 
 void app_main()
