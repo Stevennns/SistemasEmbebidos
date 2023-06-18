@@ -25,6 +25,8 @@ esp_err_t ret = ESP_OK;
 esp_err_t ret2 = ESP_OK;
 
 uint16_t val0[6];
+//extern void loop(void)
+
 
 void print_binary(uint8_t num) {
     int i;
@@ -1163,5 +1165,6 @@ void app_main(void)
    // conf_anymotion(10, true, false, true, 200, 0x02);
     printf("Comienza lectura\n\n");
     lectura();
+    //loop();
     //a funcion that 
 }
