@@ -143,16 +143,25 @@ static int8_t analyze_sensor_data(const struct bme68x_data *data, uint8_t n_meas
 */
 int8_t bme68x_init(struct bme68x_dev *dev)
 {
+    printf("dev.write =%d \n",dev->chip_id);
+    //printf("dev->intf_prt*((uint8_t *) =%d \n",*((uint8_t *)dev->intf_ptr));
     int8_t rslt;
-
+   // rslt = BME68X_OK;
+   printf("dev->chip_id antes de soft reset = %x\n ",dev->chip_id);
     rslt = bme68x_soft_reset(dev);
+    printf("dev->chip_id luego de soft reset = %x\n ",dev->chip_id);
+    printf("resultado soft reset = %d\n",rslt);
     printf("print 1\n");
     if (rslt == BME68X_OK)
     {
+        printf("dev->chip_id en pref get regs = %x\n ",dev->chip_id);
         rslt = bme68x_get_regs(BME68X_REG_CHIP_ID, &dev->chip_id, 1, dev);
+        printf("dev->chip_id post pref get regs = %x\n ",dev->chip_id);
         printf("print 2\n");
         if (rslt == BME68X_OK)
         {
+            printf("dev->chip_id en init= %x\n ",dev->chip_id);
+            printf("dev->chip_id en init= %x\n ",BME68X_CHIP_ID);
             if (dev->chip_id == BME68X_CHIP_ID)
             {
                 /* Read Variant ID */
@@ -194,6 +203,7 @@ int8_t bme68x_set_regs(const uint8_t *reg_addr, const uint8_t *reg_data, uint32_
     {
         if ((len > 0) && (len <= (BME68X_LEN_INTERLEAVE_BUFF / 2)))
         {
+            printf("dev->intf en bme68x_set_regs = %d\n",dev->intf);
             /* Interleave the 2 arrays */
             for (index = 0; index < len; index++)
             {
@@ -205,16 +215,23 @@ int8_t bme68x_set_regs(const uint8_t *reg_addr, const uint8_t *reg_data, uint32_
                 }
                 else
                 {
+                    printf("reg_addres1 %i = %d\n",index,reg_addr[index]);
                     tmp_buff[(2 * index)] = reg_addr[index];
                 }
 
                 tmp_buff[(2 * index) + 1] = reg_data[index];
+                printf("regdata %i = %d\n",index,reg_data[index]);
             }
 
             /* Write the interleaved array */
             if (rslt == BME68X_OK)
             {
+                printf("tmp_buff[0] = %d\n",tmp_buff[0]);
+                printf("&tmp_buff[1] = %d\n",tmp_buff[1]);
+                printf("(2 * len) - 1 = %ld\n",(2 * len) - 1);
+                printf("intf_ptr = %p\n",dev->intf_ptr);
                 dev->intf_rslt = dev->write(tmp_buff[0], &tmp_buff[1], (2 * len) - 1, dev->intf_ptr);
+                printf("dev->intf_rslt = %d\n",dev->intf_rslt);
                 if (dev->intf_rslt != 0)
                 {
                     rslt = BME68X_E_COM_FAIL;
@@ -240,13 +257,15 @@ int8_t bme68x_set_regs(const uint8_t *reg_addr, const uint8_t *reg_data, uint32_
 int8_t bme68x_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, struct bme68x_dev *dev)
 {
     int8_t rslt;
-
+    printf("dev->chip_id DENTRO DE GET_REGS = %x\n ",dev->chip_id);
     /* Check for null pointer in the device structure*/
     rslt = null_ptr_check(dev);
+    printf("dev->chip_id DENTRO DE GET_REGS post chekeo = %x\n ",dev->chip_id);
     if ((rslt == BME68X_OK) && reg_data)
     {
         if (dev->intf == BME68X_SPI_INTF)
         {
+            printf("esto no paso");
             /* Set the memory page */
             rslt = set_mem_page(reg_addr, dev);
             if (rslt == BME68X_OK)
@@ -254,8 +273,9 @@ int8_t bme68x_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, struct
                 reg_addr = reg_addr | BME68X_SPI_RD_MSK;
             }
         }
-
+        printf("dev->chip_id DENTRO DE GET_REGS antes del puntero result = %x\n ",dev->chip_id);
         dev->intf_rslt = dev->read(reg_addr, reg_data, len, dev->intf_ptr);
+        printf("dev->chip_id DENTRO DE GET_REGS post puntero result = %x\n ",dev->chip_id);
         if (dev->intf_rslt != 0)
         {
             rslt = BME68X_E_COM_FAIL;
@@ -279,13 +299,14 @@ int8_t bme68x_soft_reset(struct bme68x_dev *dev)
 
     /* 0xb6 is the soft reset command */
     uint8_t soft_rst_cmd = BME68X_SOFT_RESET_CMD;
-
+    printf("soft_rst_cmd = %d\n",soft_rst_cmd);
     /* Check for null pointer in the device structure*/
     rslt = null_ptr_check(dev);
     if (rslt == BME68X_OK)
     {
         if (dev->intf == BME68X_SPI_INTF)
         {
+            printf("BME68X_SPI_INTF\n");
             rslt = get_mem_page(dev);
         }
 

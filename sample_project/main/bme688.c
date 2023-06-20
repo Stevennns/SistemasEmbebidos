@@ -6,7 +6,7 @@
 //#define I2C_MASTER_FREQ_HZ 100000 // select frequency specific to your project
 #define I2C_MASTER_FREQ_HZ 400000 // select frequency specific to your project
 
-#define BME680_ADDR 0x76 // address of the BME680 sensor
+#define BME680_ADDR 0x61 // address of the BME680 sensor
 
 volatile uint8_t i2c_data[32]; // volatile variable to store the data
 
@@ -19,7 +19,8 @@ volatile uint8_t i2c_data[32]; // volatile variable to store the data
 int8_t user_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr)
 {
     int8_t rslt = 0;
-    uint8_t dev_id = *((uint8_t *)intf_ptr);
+    //uint8_t dev_id = *((uint8_t *)intf_ptr);
+    uint8_t dev_id = *((uint8_t *) intf_ptr);
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, (dev_id << 1) | I2C_MASTER_WRITE, true); // write the device address and write bit
@@ -41,14 +42,27 @@ int8_t user_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *in
 // User-defined function to write to the sensor
 int8_t user_i2c_write(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr) // Cambiar el tipo de reg_data a uint8_t
 {
-    printf("USER_I2C_WRITE LLAMADO");
+    printf("USER_I2C_WRITE LLAMADO\n");
     int8_t rslt = 0;
+    printf("reg_addr = %d\n", reg_addr); printf("reg_data = %hhn\n", reg_data);
+    printf("reg_data (p) = %p\n", reg_data); printf("reg_data (hhn)= %hhn\n", reg_data);
+    for (int i = 0; i < len; i++) { printf("reg_data[%d] = %d\n", i, reg_data[i]); }
+    //for (int i = 0; i < len; i++) { printf("reg_addres[%d] = %d\n", i, reg_addr[i]); }
+    printf("AASSDadsdsa\n");
+    printf("intf_ptr (p) = %p\n", intf_ptr);
+    //for (int i = 0; i < len; i++) { printf("intf_ptr[%d] = %d\n", i, intf_ptr[i]); }
     uint8_t dev_id = *((uint8_t *)intf_ptr);
+    //uint8_t dev_id = (uint8_t *) intf_ptr;
+    printf("dev_id = %d\n", dev_id);
+    printf("antes de cmd link create");
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+    printf("antes de start\n");
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, (dev_id << 1) | I2C_MASTER_WRITE, true);
+    printf("antes de reg_addrs\n");
     i2c_master_write_byte(cmd, reg_addr, true);
     vTaskDelay(2 / portTICK_PERIOD_MS); // Esperar 2 ms para que el sensor esté listo
+    printf("antes de reg_data\n");
     i2c_master_write(cmd, reg_data, len, true); // Cambiar el tipo de reg_data a uint8_t
     vTaskDelay(2 / portTICK_PERIOD_MS); // Esperar 2 ms para que el sensor esté listo
 
@@ -123,13 +137,16 @@ void read_bme688_data()
     struct bme68x_heatr_conf heatr_conf;
     struct bme68x_data data[3];
 
-    dev.chip_id = BME680_ADDR;
     dev.intf = BME68X_I2C_INTF;
+    uint8_t b = 0x76; // una variable local 
+    void* intf_ptr = &b; // asignamos al puntero la dirección de b
+    dev.chip_id = BME68X_CHIP_ID;
+    dev.intf_ptr = intf_ptr; 
     dev.read = (bme68x_read_fptr_t)user_i2c_read; // user-defined function to read from the sensor
     dev.write = (bme68x_write_fptr_t)user_i2c_write; // user-defined function to write to the sensor
     dev.delay_us = (bme68x_delay_us_fptr_t)user_delay_us; // user-defined function to delay in microseconds
     printf("Despues de la estructura\n"); // print the result
-
+    //rslt = BME68X_OK;
     rslt = bme68x_init(&dev); // initialize the device
     printf("llamado bme68x_init(&dev)\n"); // print the result
     vTaskDelay(5 / portTICK_PERIOD_MS); // Esperar 5 ms para que el sensor esté listo
