@@ -7,9 +7,9 @@
 
 #include <stdio.h>
 
-#include "bme68x.h"
-#include "common.h"
-#include "coines.h"
+#include "bme68x/bme68x.h"
+#include "common/common.h"
+#include "common/coines.h"
 
 /***********************************************************************/
 /*                         Macros                                      */
@@ -22,7 +22,7 @@
 /*                         Test code                                   */
 /***********************************************************************/
 
-int main(void)
+int app_main(void)
 {
     struct bme68x_dev bme;
     int8_t rslt;
@@ -38,7 +38,7 @@ int main(void)
      * For I2C : BME68X_I2C_INTF
      * For SPI : BME68X_SPI_INTF
      */
-    rslt = bme68x_interface_init(&bme, BME68X_SPI_INTF);
+    rslt = bme68x_interface_init(&bme, BME68X_I2C_INTF);
     bme68x_check_rslt("bme68x_interface_init", rslt);
 
     rslt = bme68x_init(&bme);

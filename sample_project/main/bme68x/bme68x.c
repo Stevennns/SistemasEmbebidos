@@ -156,7 +156,7 @@ int8_t bme68x_init(struct bme68x_dev *dev)
     {
         //printf("dev->chip_id en pref get regs = %x\n ",dev->chip_id); // aqui es 0x61
         rslt = bme68x_get_regs(BME68X_REG_CHIP_ID, &dev->chip_id, 1, dev);
-        //printf("rslt de leer =  %d\n ",rslt); // aqui es ff 
+        printf("rslt de leer REG CHIP_ID=  %d\n ",rslt);  
         //printf("dev->chip_id post pref get regs = %x\n ",dev->chip_id); // aqui es ff 
         //printf("print 2\n");
         if (rslt == BME68X_OK)

@@ -38,7 +38,7 @@ class BMI270:
         self.pressure = (self.bin_to_int(vector[4], vector[5], vector[6], vector[7]) / 256.0) + 26700.0
         self.temperature = self.bin_to_int(vector[0], vector[1], vector[2], vector[3]) / 100.0
 
-        # print([self.humidity, self.pressure, self.temperature])
+        print([self.humidity, self.pressure, self.temperature])
 
     # Método que permite transformar un número de 2 bytes complemento a 2 a entero con signo
     def bin_to_int(self, a, b, c, d):
@@ -174,6 +174,9 @@ class MainWindow():
         texto =self.ui.selec_12.itemText(index)
         print(texto)
         return texto
+    
+    def extraer_puerto(self):
+        pass
 
 if __name__ == "__main__":
     import sys
