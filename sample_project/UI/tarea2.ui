@@ -269,8 +269,8 @@ muestreo</string>
   <widget class="QGraphicsView" name="Plot1">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>420</y>
+     <x>480</x>
+     <y>0</y>
      <width>291</width>
      <height>181</height>
     </rect>
@@ -458,7 +458,69 @@ muestreo</string>
     <string>boton bkn</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="test_boton_2">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>320</y>
+     <width>101</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>parar</string>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="plot_1">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>420</y>
+     <width>291</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(0, 0, 0);</string>
+   </property>
+  </widget>
+  <zorder>Plot1</zorder>
+  <zorder>label_30</zorder>
+  <zorder>progressBar</zorder>
+  <zorder>selec_12</zorder>
+  <zorder>label_9</zorder>
+  <zorder>text_acc_sampling</zorder>
+  <zorder>label_7</zorder>
+  <zorder>label_2</zorder>
+  <zorder>text_acc_sensibity</zorder>
+  <zorder>selec_13</zorder>
+  <zorder>label_31</zorder>
+  <zorder>label_32</zorder>
+  <zorder>label_33</zorder>
+  <zorder>label_8</zorder>
+  <zorder>label_10</zorder>
+  <zorder>text_acc_sensibity_2</zorder>
+  <zorder>text_acc_sampling_2</zorder>
+  <zorder>Plot2</zorder>
+  <zorder>Plot3</zorder>
+  <zorder>Plot4</zorder>
+  <zorder>label_3</zorder>
+  <zorder>label_4</zorder>
+  <zorder>label_5</zorder>
+  <zorder>label_6</zorder>
+  <zorder>pushButton</zorder>
+  <zorder>pushButton_2</zorder>
+  <zorder>test_boton</zorder>
+  <zorder>test_boton_2</zorder>
+  <zorder>plot_1</zorder>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>pyqtgraph</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

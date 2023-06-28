@@ -48,7 +48,7 @@ class BME280:
 
 
 class SerialRead:
-    def __init__(self, serialPort='com4', serialBaud=115200):
+    def __init__(self, serialPort='com3', serialBaud=115200):
         self.port = serialPort
         self.baud = serialBaud
         self.dataType = None
@@ -93,8 +93,10 @@ class SerialRead:
         time.sleep(1.0)  # give some buffer time for retrieving data
         self.serialConnection.reset_input_buffer()
         while (self.isRun):
-            aux = self.serialConnection.read_until(b'\x00')
+            aux = self.serialConnection.read_until(b"\n")
+            print(f"aux es: {aux}")
             data = self.BME.decod_COBS(aux)
+            print(f"data es: {data}")
             if(len(data)==12):
                 self.BME.data(data)
                 self.humidity.append(self.BME.humidity)

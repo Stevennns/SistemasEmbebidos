@@ -25,7 +25,7 @@ import numpy
 import os.path as path
 import time
 import scipy.io
-import pygame
+#import pygame
 
 
 class BMI270:
@@ -137,23 +137,67 @@ class SerialRead:
         self.thread.join()
         self.serialConnection.close()
 
+class SerialThread(QThread):
+    def __init__(self):
+        super().__init__()
+        self.running = True
+
+    def stop(self):
+        self.running = False
+
+    def run(self):
+        #print("algo pasa")
+        try:
+            com = serial.Serial("com3", 115200,parity=serial.PARITY_EVEN, rtscts=1)
+            print(com.read_all())
+            print("Conexión serial exitosa")
+            print(self.running)
+
+            hola = "hola"
+            #com.write(hola.encode())
+            #com.close()
+            while self.running:
+                #print("read")
+                t = com.read(10)
+                print(t)
+                print(f"texto es: {t.decode()}")
+            com.close()
+            print("Conexión serial Terminada")
+        except serial.SerialException as e:
+            print(f"Error en la conexión serial: {str(e)}")
+
+
 class MainWindow():
 
     def __init__(self, parent):
         #super(MainWindow, self).init()
         self.ui = Ui_Dialog()
         self.parent = parent
-        self.serialRead = SerialRead()
-        self.serialRead.readSerialStart()
-        #self.ui.btnStop.clicked.connect(self.stopSerialRead)
+        self.serialThread = SerialThread()
+        #self.serialRead.readSerialStart()
+        
 
     def stopSerialRead(self):
-        self.serialRead.stop()
-        QMessageBox.information(self, "Serial Read", "Serial read stopped.")
+        print("stop")
+        self.serialThread.stop()
+        self.serialThread.wait()  # Esperar a que el hilo termine antes de continuar
 
     def setSignals(self):
         self.ui.selec_12.currentIndexChanged.connect(self.leerModoOperacion)
-        self.ui.pushButton.clicked.connect(self.leerConfiguracion)
+        self.ui.pushButton.clicked.connect(self.leerModoOperacion)
+        self.ui.test_boton.clicked.connect(self.leerPuerto)
+        self.ui.test_boton_2.clicked.connect(self.stopSerialRead)
+    def leerPuerto(self):
+        print("puerto 34")
+        self.serialThread.start()
+        #com = serial.Serial("com3", 115200)
+        #t = com.read(10)  # Leer 10 bytes
+        #print(f"texto es: {t}")
+        #return
+        #data = self.BME.decod_COBS(aux)
+    def stopSerialRead(self):
+        self.serialThread.stop()
+        
 
     def leerConfiguracionAcelerometro(self):
         conf = dict()
@@ -177,6 +221,18 @@ class MainWindow():
     
     def extraer_puerto(self):
         pass
+    def plot1(self):
+        p = self.ui.plot_1
+        # Crear los datos de tiempo y temperatura
+        tiempo = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        temperatura = [25, 24, 23, 22, 21, 20, 19, 18, 17, 16]
+
+        # Agregar el gráfico de tiempo vs temperatura al objeto plot_1
+        p.plot(tiempo, temperatura, pen='b', symbol='o')
+
+        # Configurar el eje x y el eje y con etiquetas
+        p.setLabel('left', 'Temperatura (°C)')
+        p.setLabel('bottom', 'Tiempo (s)')
 
 if __name__ == "__main__":
     import sys
@@ -188,5 +244,6 @@ if __name__ == "__main__":
     ui.setupUi(Dialog)
     Dialog.show()
     cont.setSignals()
+    cont.plot1()
     sys.exit(app.exec_())
 
