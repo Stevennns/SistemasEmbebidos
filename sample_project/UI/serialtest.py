@@ -1,21 +1,18 @@
 import serial
 
-ser = serial.Serial('com3', baudrate=115200)
+ser = serial.Serial('COM3', baudrate=115200)
 
+def send_command(command):
+    ser.write(command.encode('utf-8'))
+    print("Comando enviado:", command)
 
-def llamar(i):
-    if i == 0:
-        while True:
-            if ser.in_waiting > 0:
-                data = ser.read(ser.in_waiting).decode('utf-8').rstrip()
-    else:
+    #response = ser.readline().decode('utf-8').rstrip()
+    #print("Respuesta recibida:", response)
+    #return 
+def leer():
+    response = ser.readline().decode('utf-8').rstrip()
+    print("Respuesta recibida:", response)
+    leer()
+send_command("PING")  # Enviar el comando "PING" a la ESP32
 
-        data = "Hola desde Python"  # Datos a ser escritos
-
-        ser.write(data.encode('utf-8'))  # Escribe los datos en el puerto serial
-
-        print("Datos escritos con éxito:", data)
-
-        ser.close()  # Cierra la conexión serial
-
-llamar(0)
+ser.close()

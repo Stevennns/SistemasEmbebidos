@@ -1060,6 +1060,41 @@ void conf_anymotion(uint16_t duration, int select_x, int select_y, int select_z,
     bmi_write(I2C_NUM_0, &reg_anymo_2, &reg_value2, 1);
 }
 
+
+
+
+#define MAX_LINE_LENGTH 100
+
+int read_config_file(int* array,char* line) {
+    FILE *file;
+
+    int i = 0;
+
+    // Abre el archivo en modo de lectura
+    file = fopen("D:\\Universidad\\2023-1\\Sistemas embedidos\\Tarea1\\sample_project\\files\\config.txt", "r");
+
+    if (file == NULL) {
+        printf("No se pudo abrir el archivo.\n");
+        return 1;
+    }
+
+    // Lee cada línea del archivo
+    while (fgets(line, sizeof(line), file) != NULL) {
+        // Convierte la línea a entero y guárdala en el arreglo
+        array[i] = atoi(line);
+        i++;
+    }
+
+    // Cierra el archivo
+    fclose(file);
+
+    // Imprime los elementos del arreglo
+    printf("Elementos del arreglo:\n");
+    for (int j = 0; j < i; j++) {
+        printf("%d\n", array[j]);
+    }
+    return 0;
+}
 /*
 // Función para configurar el anymotion y la interrupción en el sensor BMI270 
 void bmi_anymotion_int_config(uint16_t duration, int select_x, int select_y, int select_z, uint8_t threshold, uint8_t out_conf) { // Llamar a la función conf_anymotion con los parámetros que quieras conf_anymotion(duration, select_x, select_y, select_z, threshold, out_conf);
@@ -1080,6 +1115,9 @@ bmi_write(I2C_NUM_0, buffer, 2); }
 
 void app_main(void)
 {
+
+    char line[MAX_LINE_LENGTH];
+    int array[MAX_LINE_LENGTH];
     ESP_ERROR_CHECK(bmi_init());
     softreset();
     chipid();
@@ -1162,6 +1200,11 @@ void app_main(void)
 
    // conf_anymotion(10, true, false, true, 200, 0x02);
     printf("Comienza lectura\n\n");
-    lectura();
+    int a = read_config_file(array,line);
+    
+    for(int i = 0; i<MAX_LINE_LENGTH;i++){
+        printf("%d",array[i]);
+    }
+    //lectura();
     //a funcion that 
 }
