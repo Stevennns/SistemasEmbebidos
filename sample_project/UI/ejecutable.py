@@ -234,6 +234,12 @@ class MainWindow():
         p.setLabel('left', 'Temperatura (°C)')
         p.setLabel('bottom', 'Tiempo (s)')
 
+    def escribir_datos(self):
+        campos = self.campos
+        file = open("../files/config.txt")
+        file.write(campos)
+        file.close()
+
 if __name__ == "__main__":
     import sys
     app= QtWidgets.QApplication(sys.argv)
