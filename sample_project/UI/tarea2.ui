@@ -266,38 +266,6 @@ muestreo</string>
     </rect>
    </property>
   </widget>
-  <widget class="QGraphicsView" name="Plot2">
-   <property name="geometry">
-    <rect>
-     <x>420</x>
-     <y>420</y>
-     <width>291</width>
-     <height>181</height>
-    </rect>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::Box</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Plain</enum>
-   </property>
-  </widget>
-  <widget class="QGraphicsView" name="Plot3">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>640</y>
-     <width>291</width>
-     <height>181</height>
-    </rect>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::Box</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Plain</enum>
-   </property>
-  </widget>
   <widget class="QGraphicsView" name="Plot4">
    <property name="geometry">
     <rect>
@@ -652,6 +620,32 @@ muestreo</string>
      <string>4</string>
     </property>
    </item>
+  </widget>
+  <widget class="PlotWidget" name="plot_2">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>420</y>
+     <width>291</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(0, 0, 0);</string>
+   </property>
+  </widget>
+  <widget class="PlotWidget" name="plot_3">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>640</y>
+     <width>291</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(0, 0, 0);</string>
+   </property>
   </widget>
  </widget>
  <customwidgets>
