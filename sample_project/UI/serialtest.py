@@ -29,7 +29,7 @@ def receive_data():
     data = unpack("@{}d".format(num_doubles), data_bytes)
     #data = unpack("<{}d", data)
     #print(data)
-    print(f'Received: {data}')
+    #print(f'Received: {data}')
     return data
 
 def send_end_message():
@@ -47,7 +47,8 @@ def begin_serial():
         if ser.in_waiting > 0:
             try:
                 message = receive_data()
-            
+                #print(message)
+                yield message
             except Exception as inst:
 
                 print('Error en leer mensaje')
@@ -57,7 +58,7 @@ def begin_serial():
                 counter += 1
                 print(counter)
             finally:
-                if counter == 10:
+                if counter == 30:
                     print('Lecturas listas!')
                     break
 
