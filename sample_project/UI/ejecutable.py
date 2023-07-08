@@ -26,7 +26,7 @@ import os.path as path
 import time
 import scipy.io
 #import pygame
-
+from serialtest import *
 
 class BMI270:
     # Definición de las variables iniciales
