@@ -298,7 +298,7 @@ muestreo</string>
     <enum>QFrame::Box</enum>
    </property>
    <property name="text">
-    <string>Datos 1: &lt;Datos&gt;</string>
+    <string>Datos 1: Aceleración</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -320,7 +320,7 @@ muestreo</string>
     <enum>QFrame::Box</enum>
    </property>
    <property name="text">
-    <string>Datos 2: &lt;Datos&gt;</string>
+    <string>Datos 2: Aceleración angular</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -342,7 +342,7 @@ muestreo</string>
     <enum>QFrame::Box</enum>
    </property>
    <property name="text">
-    <string>Datos 3: &lt;Datos&gt;</string>
+    <string>Datos 3: Aceleración</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -407,7 +407,7 @@ muestreo</string>
     </rect>
    </property>
    <property name="text">
-    <string>boton bkn</string>
+    <string>Limpiar puerto</string>
    </property>
   </widget>
   <widget class="QPushButton" name="test_boton_2">

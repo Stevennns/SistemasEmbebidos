@@ -52,6 +52,7 @@ class SerialThread(QThread):
     def stop(self):
         self.running = False
         send_end_message()
+        close_connection()
 
     def plot1(self,cont):
         p = cont.plot_1
@@ -61,8 +62,7 @@ class SerialThread(QThread):
         #tiempo = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         p.setYRange(-50, 50, padding=0)
 
-        data = self.data
-        print("uwu: ",data)
+        #print("uwu: ",data)
         #temperatura = [25, 24, 23, 22, 21, 20, 19, 18, 17, 16]
 
         # Agregar el gráfico de tiempo vs temperatura al objeto plot_1
@@ -103,7 +103,6 @@ class SerialThread(QThread):
 
     def run(self):
         try:
-   
             data_generator = begin_serial()
             for data in data_generator:
                 print("data for",data)
@@ -163,7 +162,7 @@ class MainWindow():
     def setSignals(self):
         self.ui.selec_12.currentIndexChanged.connect(self.leerModoOperacion)
         self.ui.pushButton.clicked.connect(self.leerModoOperacion)
-        self.ui.test_boton.clicked.connect(self.empezarSerialRead)
+        self.ui.pushButton_2.clicked.connect(self.empezarSerialRead)
         self.ui.test_boton_2.clicked.connect(self.stopSerialRead)
 
     def empezarSerialRead(self):

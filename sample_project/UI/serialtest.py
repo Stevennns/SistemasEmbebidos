@@ -15,18 +15,19 @@ def send_message(message):
 #def receive_response():
     #response = ser.read_until(b'\x00')  # Reading until \0
     #return response[:-1]
+
 def receive_response():
     response = ser.read(72)  # Leer 72 bytes
     return response
 
 def receive_data():
     data_bytes = receive_response()
-    #print(data_bytes)
     # Determinar el número de doubles en los datosS
     num_doubles = len(data_bytes) // 8
     #print("bytes que usan es :" ,num_doubles)
     # Desempaquetar los datos en doubles
     data = unpack("@{}d".format(num_doubles), data_bytes)
+
     #data = unpack("<{}d", data)
     #print(data)
     #print(f'Received: {data}')
@@ -35,6 +36,10 @@ def receive_data():
 def send_end_message():
     end_message = pack('4s', 'END\0'.encode())
     ser.write(end_message)
+
+def close_connection():
+    print("Cerrando conexión...")
+    ser.close()
 
 def begin_serial():
     # Send "BEGIN" message
@@ -66,7 +71,8 @@ def begin_serial():
     send_end_message()
 
     # Waiting for message OK to end communications
-    while True:
+
+'''   while True:
         if ser.in_waiting > 0:
             try:
                 message = receive_response()
@@ -79,4 +85,4 @@ def begin_serial():
                     print('Cerrando conexión...')
                     break
     ser.close()
-        
+        '''

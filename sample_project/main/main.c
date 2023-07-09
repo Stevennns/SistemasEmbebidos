@@ -67,9 +67,9 @@ void app_main(){
     }
 
     // Data sending stopped, sending just OK with \0 at the end
-    while (1)
+    /*while (1)
     {
         uart_write_bytes(UART_NUM,"OK\0",3);
-    }
+    }*/
 
 }

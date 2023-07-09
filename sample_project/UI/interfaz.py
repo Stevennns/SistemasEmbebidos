@@ -204,14 +204,14 @@ class Ui_Dialog(object):
         self.label_8.setText(_translate("Dialog", "Frecuencia de\n"
 " muestreo"))
         self.label_10.setText(_translate("Dialog", "Sensibilidad"))
-        self.label_3.setText(_translate("Dialog", "Datos 1: <Datos>"))
-        self.label_4.setText(_translate("Dialog", "Datos 2: <Datos>"))
-        self.label_5.setText(_translate("Dialog", "Datos 3: <Datos>"))
+        self.label_3.setText(_translate("Dialog", "Datos 1: Aceleración"))
+        self.label_4.setText(_translate("Dialog", "Datos 2: Aceleración angular"))
+        self.label_5.setText(_translate("Dialog", "Datos 3: Aceleración"))
         self.label_6.setText(_translate("Dialog", "Datos 4: <Datos>"))
         self.pushButton.setText(_translate("Dialog", "Iniciar configuración"))
         self.pushButton_2.setText(_translate("Dialog", "Iniciar captación \n"
 " de datos"))
-        self.test_boton.setText(_translate("Dialog", "boton bkn"))
+        self.test_boton.setText(_translate("Dialog", "Limpiar puerto"))
         self.test_boton_2.setText(_translate("Dialog", "parar"))
         self.comboBox.setItemText(0, _translate("Dialog", "6"))
         self.comboBox.setItemText(1, _translate("Dialog", "1"))
