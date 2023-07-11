@@ -16,12 +16,16 @@ def send_message(message):
     #response = ser.read_until(b'\x00')  # Reading until \0
     #return response[:-1]
 
+def read_trash():
+    trash = ser.read(2880)
+    return trash
 def receive_response():
     response = ser.read(72)  # Leer 72 bytes
     return response
 
 def receive_data():
     data_bytes = receive_response()
+    print('data en bytes ',data_bytes)
     # Determinar el número de doubles en los datosS
     num_doubles = len(data_bytes) // 8
     #print("bytes que usan es :" ,num_doubles)
@@ -41,13 +45,26 @@ def close_connection():
     print("Cerrando conexión...")
     ser.close()
 
-def begin_serial():
+# Funcion que en envia un arreglo de 4 elementos enteros de 32 bits
+def send_array(array):
+    packed_array = pack('4i', *array)
+    ser.write(packed_array)
+
+
+
+def begin_serial(array):
+    #print(array)
+    #send_array(array)
     # Send "BEGIN" message
     message = pack('6s','BEGIN\0'.encode())
     ser.write(message)
+    send_array(array)
 
+    
     # Read data from the serial port, waiting for the data
     counter = 0
+    trash = read_trash()
+    print('trash: ',trash)
     while True:
         if ser.in_waiting > 0:
             try:
@@ -62,10 +79,10 @@ def begin_serial():
             else: 
                 counter += 1
                 print(counter)
-            finally:
-                if counter == 30:
-                    print('Lecturas listas!')
-                    break
+            #finally:
+            #    if counter == 30:
+            #        print('Lecturas listas!')
+            #        break
 
     # Sending message to end data sending
     send_end_message()
@@ -86,3 +103,4 @@ def begin_serial():
                     break
     ser.close()
         '''
+

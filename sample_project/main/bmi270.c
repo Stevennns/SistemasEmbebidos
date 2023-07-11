@@ -1229,11 +1229,11 @@ void bmi270_execute(double data[])
     initialization();
     check_initialization();
     
-    acc_conf(8);
-    acc_range(0);
+    //acc_conf(8);
+    //acc_range(0);
 
-    gyr_conf(12);
-    gyr_range(0);
+    //gyr_conf(12);
+    //gyr_range(0);
     
 
     performance_powermode();

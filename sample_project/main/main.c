@@ -1,7 +1,7 @@
 #include "bmi270.c"
 //#include "bme688.c"
 #include "uart.c"
-
+//#define BUF_SIZE 16
 void app_main(){
     uart_setup(); // Uart setup
     ESP_ERROR_CHECK(bmi_init());
@@ -26,8 +26,11 @@ void app_main(){
 
     srand(time(NULL));  // Initialize random seed
 
+
+    
     // Waiting for an BEGIN to initialize data sending
     char dataResponse1[6];
+    int conf[4];
     //printf("Beginning initialization... \n");
     while (1)
     {
@@ -37,6 +40,15 @@ void app_main(){
             if (strcmp(dataResponse1, "BEGIN") == 0)
             {
                 //uart_write_bytes(UART_NUM,"OK\0",3);
+                receive_conf(conf); // se recibe el arreglo de configuracion
+                /*for (int i = 0; i < 4; i++) {
+                    printf("Received conf: %d\r\n", conf[i]);
+                }*/
+                acc_conf(conf[0]); // se configura el acelerometro
+                acc_range(conf[1]);
+                gyr_conf(conf[2]); // se configura el giroscopio
+                gyr_range(conf[3]);
+
                 break;
             }
         }

@@ -73,6 +73,35 @@ int serial_read(char *buffer, int size){
     return len;
 }
 
+#define ARRAY_SIZE 4
+
+void receive_conf(int array[]) {
+    uint8_t buffer[sizeof(int) * ARRAY_SIZE];
+    while(1){
+    int len = uart_read_bytes(UART_NUM_0, buffer, sizeof(buffer), pdMS_TO_TICKS(1000));
+    if (len > 0){
+        //printf("function called\n");
+        int data[ARRAY_SIZE];
+        for (int i = 0; i < ARRAY_SIZE; i++) {
+            data[i] = ((int)buffer[i * sizeof(int)]) |
+                    ((int)buffer[i * sizeof(int) + 1] << 8) |
+                    ((int)buffer[i * sizeof(int) + 2] << 16) |
+                    ((int)buffer[i * sizeof(int) + 3] << 24);
+        }
+        array[0] = data[0];
+        array[1] = data[1];
+        array[2] = data[2];
+        array[3] = data[3];
+
+        /*for (int i = 0; i < ARRAY_SIZE; i++) {
+            printf("Received data: %d\r\n", data[i]);
+        }*/
+        break;
+    }
+    }
+}
+
+
 // Main
 void app_main2()
 {
