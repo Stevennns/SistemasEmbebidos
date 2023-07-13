@@ -34,6 +34,8 @@ class SerialThread(QThread):
         self.running = True
         self.data = []
         self.conf = []
+        self.serialThread = 0
+
         self.acc_x = deque(maxlen=10)
         self.acc_y = deque(maxlen=10)
         self.acc_z = deque(maxlen=10)
@@ -48,6 +50,11 @@ class SerialThread(QThread):
 
         self.tiempo = deque(maxlen=10)
         self.count_time = 0
+
+        self.temp = deque(maxlen=10)
+        self.hum = deque(maxlen=10)
+        self.pres = deque(maxlen=10)
+        self.gas = deque(maxlen=10)
 
     def stop(self):
         self.running = False
@@ -65,13 +72,14 @@ class SerialThread(QThread):
         #print("uwu: ",data)
         #temperatura = [25, 24, 23, 22, 21, 20, 19, 18, 17, 16]
 
+        p.addLegend(size=(2,2), offset=1, labelTextSize='5pt')
         # Agregar el gráfico de tiempo vs temperatura al objeto plot_1
-        line1 = p.plot(list(self.tiempo), list(self.acc_x), pen='b', symbol='o')
-        line2 = p.plot(list(self.tiempo), list(self.acc_y), pen='r', symbol='o')
-        line3 = p.plot(list(self.tiempo), list(self.acc_z), pen='g', symbol='o')
+        line1 = p.plot(list(self.tiempo), list(self.acc_x), pen='b', symbol='o', name='acc_x')
+        line2 = p.plot(list(self.tiempo), list(self.acc_y), pen='r', symbol='o', name='acc_y')
+        line3 = p.plot(list(self.tiempo), list(self.acc_z), pen='g', symbol='o', name='acc_z')
         
         # Configurar el eje x y el eje y con etiquetas
-        p.setLabel('left', 'Aceleración (m/s2)')
+        p.setLabel('left', 'Aceleración (m/s^2)')
         p.setLabel('bottom', 'Tiempo (s)')
 
     def plot2(self,cont):
@@ -79,10 +87,11 @@ class SerialThread(QThread):
         p2.clear()
         p2.setYRange(-15, 15, padding=0)
 
+        p2.addLegend(size=(2,2), offset=1, labelTextSize='5pt')
         # Agregar el gráfico de tiempo vs temperatura al objeto plot_1
-        line1 = p2.plot(list(self.tiempo), list(self.gyr_x), pen='b', symbol='o')
-        line2 = p2.plot(list(self.tiempo), list(self.gyr_y), pen='r', symbol='o')
-        line3 = p2.plot(list(self.tiempo), list(self.gyr_z), pen='g', symbol='o')
+        line1 = p2.plot(list(self.tiempo), list(self.gyr_x), pen='b', symbol='o', name='gyr_x')
+        line2 = p2.plot(list(self.tiempo), list(self.gyr_y), pen='r', symbol='o', name='gyr_y')
+        line3 = p2.plot(list(self.tiempo), list(self.gyr_z), pen='g', symbol='o', name='gyr_z')
         
         # Configurar el eje x y el eje y con etiquetas
         p2.setLabel('left', 'Aceleración angular (rad/s)')
@@ -91,11 +100,13 @@ class SerialThread(QThread):
     def plot3(self,cont):
         p3 = cont.plot_3
         p3.clear()
-        p3.setYRange(-10, 10, padding=0)
+        p3.setYRange(-3, 3, padding=0)
+
+        p3.addLegend(size=(2,2), offset=1, labelTextSize='5pt')
         # Agregar el gráfico de tiempo vs temperatura al objeto plot_1
-        line1 = p3.plot(list(self.tiempo), list(self.acc_xg), pen='b', symbol='o')
-        line2 = p3.plot(list(self.tiempo), list(self.acc_yg), pen='r', symbol='o')
-        line3 = p3.plot(list(self.tiempo), list(self.acc_zg), pen='g', symbol='o')
+        line1 = p3.plot(list(self.tiempo), list(self.acc_xg), pen='b', symbol='o', name='acc_xg')
+        line2 = p3.plot(list(self.tiempo), list(self.acc_yg), pen='r', symbol='o', name='acc_yg')
+        line3 = p3.plot(list(self.tiempo), list(self.acc_zg), pen='g', symbol='o', name='acc_zg')
         
         # Configurar el eje x y el eje y con etiquetas
         p3.setLabel('left', 'Aceleración (g)')
@@ -103,30 +114,35 @@ class SerialThread(QThread):
 
     def run(self):
         try:
-            
-            data_generator = begin_serial(self.conf)
-            for data in data_generator:
-                if not self.running:
-                    break
-                print("data for",data)
-                self.data = list(data)
+            if self.sensor == 0:
+                data_generator = begin_serial(self.conf)
+                for data in data_generator:
+                    if not self.running:
+                        break
+                    print("data for",data)
+                    self.data = list(data)
 
-                self.acc_x.append(self.data[0])
-                self.acc_y.append(self.data[1])
-                self.acc_z.append(self.data[2])
+                    self.acc_x.append(self.data[0])
+                    self.acc_y.append(self.data[1])
+                    self.acc_z.append(self.data[2])
 
-                self.gyr_x.append(self.data[3])
-                self.gyr_y.append(self.data[4])
-                self.gyr_z.append(self.data[5])
+                    self.gyr_x.append(self.data[3])
+                    self.gyr_y.append(self.data[4])
+                    self.gyr_z.append(self.data[5])
 
-                self.acc_xg.append(self.data[6])
-                self.acc_yg.append(self.data[7])
-                self.acc_zg.append(self.data[8])
+                    self.acc_xg.append(self.data[6])
+                    self.acc_yg.append(self.data[7])
+                    self.acc_zg.append(self.data[8])
 
-                self.tiempo.append(self.count_time)
-                self.count_time += 1
-                print("data=",self.data)
-            #print(self.data)
+                    self.tiempo.append(self.count_time)
+                    self.count_time += 1
+                    print("data=",self.data)
+                #print(self.data)
+            elif self.sensor == 1:
+                for data in data_generator:
+                    if not self.running:
+                        break
+                    print("data for",data)
         except serial.SerialException as e:
             print(f"Error en la conexión serial: {str(e)}")
 
@@ -164,21 +180,17 @@ class MainWindow():
 
     def setSignals(self):
         self.ui.selec_12.currentIndexChanged.connect(self.leerModoOperacion)
-        self.ui.pushButton.clicked.connect(self.leerModoOperacion)
         self.ui.pushButton_2.clicked.connect(self.empezarSerialRead)
         self.ui.test_boton_2.clicked.connect(self.stopSerialRead)
-        self.ui.pushButton.clicked.connect(self.leerConfiguracion)
 
     def empezarSerialRead(self):
+        self.serialThread.sensor = 0
         self.ui.pushButton_2.setEnabled(False)
         self.ui.test_boton_2.setEnabled(True)
         self.start_timer1()
         self.serialThread.conf = self.leerConfiguracion()
         self.serialThread.start()
 
-    #def stopSerialRead(self):
-    #    self.serialThread.stop()
-        
 
     def leerConfiguracion(self):
         #conf = dict()
@@ -192,6 +204,8 @@ class MainWindow():
         conf.append(GyrSamp)
         conf.append(GyrSen)
         print(conf)
+        self.alternarBotonBMI(False)
+        self.ui.selec_12.setEnabled(False)
         return conf
     
     def leerConfiguracionAcelerometro(self):
@@ -213,10 +227,12 @@ class MainWindow():
         texto =self.ui.selec_12.itemText(index)
         print(texto)
         if (texto == "BMI270"):
+            self.serialThread.sensor = 0
             self.alternarBotonBMI(True)
             self.alternarbotonBME(False)
             self.ui.pushButton_2.setEnabled(True)
         elif (texto == "BME688"):
+            self.serialThread.sensor = 1
             self.alternarBotonBMI(False)
             self.alternarbotonBME(True)
             self.ui.pushButton_2.setEnabled(True)
